@@ -1,12 +1,17 @@
 #include <iostream>
 #include <cstdint>
 #include <memory>
+#include <fstream>
 
 #include "red_black_tree.hpp"
 
+// что сделать еще
+// поиск элемента 
+// удаление элемента
+// сделать 5 (copy ctor, move ctor, op=, op=, dtor)
+
 int main() {
-    std::cout << "start\n";
-    uint64_t key = 100;
+    uint64_t key = 100; // сделать добавление в режиме реального времени
     int a = 0, b = 0;
 
     //std::shared_ptr<Tree::Node<uint64_t>> root = std::make_shared<Tree::Node<uint64_t>>(key);
@@ -24,12 +29,33 @@ int main() {
         }
         else if (mode == 'q') {
             std::cin >> a >> b;
-            rb_tree.serch(a, b);
+            if (a > b)  {
+                std::cout << "0\n";
+                break;
+            }
+            rb_tree.search(a, b);
         }
         else 
             break;
     }
-    rb_tree.print(*rb_tree.root_);
+    //#ifndef NDEBUG
+        /*   create a tree in graphviz   */
+    std::ofstream file_graph;
+    file_graph.open("file_graph.dot");
+
+    file_graph << "digraph RB_tree{\n"
+                  "label = < Red-black tree >;\n"
+                  "bgcolor = \"#BAF0EC\";\n"
+                  "node [shape = record ];\n"
+                  "edge [style = filled ];\n";
+   
+
+    rb_tree.print(*rb_tree.root_, file_graph);
+    file_graph << "}";
+    file_graph.close();
+    system ("dot -Tpng file_graph.dot -o tree_graph.png");
+    system ("open tree_graph.png");
+    //#endif
 
     return 0;
 }
