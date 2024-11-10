@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <memory>
 #include <fstream>
+#include <string>
 
 #include "red_black_tree.hpp"
 
@@ -14,7 +15,6 @@ int main() {
     uint64_t key = 100; // сделать добавление в режиме реального времени
     int a = 0, b = 0;
 
-    //std::shared_ptr<Tree::Node<uint64_t>> root = std::make_shared<Tree::Node<uint64_t>>(key);
     Tree::Red_black_tree<uint64_t> rb_tree{key};
 
     std::cout << "root was created\n";
@@ -41,20 +41,22 @@ int main() {
     //#ifndef NDEBUG
         /*   create a tree in graphviz   */
     std::ofstream file_graph;
-    file_graph.open("file_graph.dot");
+    std::string file_name = "graphviz/file_graph.dot";
+    file_graph.open(file_name);
 
     file_graph << "digraph RB_tree{\n"
                   "label = < Red-black tree >;\n"
-                  "bgcolor = \"#BAF0EC\";\n"
-                  "node [shape = record ];\n"
+                  "bgcolor = \"DarkGrey\";\n"
+                  "node [shape = record, tfillcolor = \"pink\", penwidth = 5, color = \"Cornsilk\", fontcolor = \"white\" ];\n"
                   "edge [style = filled ];\n";
-   
-
+           
     rb_tree.print(*rb_tree.root_, file_graph);
     file_graph << "}";
     file_graph.close();
-    system ("dot -Tpng file_graph.dot -o tree_graph.png");
-    system ("open tree_graph.png");
+    std::string graph_cmd = "dot -Tpng " + file_name + " -o " +
+                          "graphviz/rb_tree.png -Gdpi=100\n";
+
+    std::system(graph_cmd.c_str());
     //#endif
 
     return 0;

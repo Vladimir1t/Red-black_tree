@@ -222,17 +222,15 @@ public:
        // std::cout << " { " << node.key_ << " color: " << static_cast<int>(node.color);
 
         if (node.left_) {
-            file_name 
-            << node.key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.color) == 0 ? "maroon" : "Gray") << ", label = \"" <<  node.key_ << "\" ];\n"
-            << node.left_->key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.left_->color) == 0 ? "maroon" : "Gray") << ", label = \"" << node.left_->key_ << "\" ];\n"
-            << node.key_ << " -> " << node.left_->key_ << ";\n";
+            file_name << node.key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.color) == 0 ? "DarkRed" : "black") << ", label = \"" <<  node.key_ << "\" ];\n"
+                      << node.left_->key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.left_->color) == 0 ? "DarkRed" : "black") << ", label = \"" << node.left_->key_ << "\" ];\n"
+                      << node.key_ << " -> " << node.left_->key_ << ";\n";
             print(*node.left_, file_name);
         }
         if (node.right_) {
-            file_name 
-            << node.key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.color) == 0 ? "maroon" : "Gray") << ", label = \"" <<  node.key_ << "\" ];\n"
-            << node.right_->key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.right_->color) == 0 ? "maroon" : "Gray") << ", label = \"" << node.right_->key_ << "\" ];\n"
-            << node.key_ << " -> " << node.right_->key_ << ";\n";
+            file_name << node.key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.color) == 0 ? "DarkRed" : "black") << ", label = \"" <<  node.key_ << "\" ];\n"
+                      << node.right_->key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.right_->color) == 0 ? "DarkRed" : "black") << ", label = \"" << node.right_->key_ << "\" ];\n"
+                      << node.key_ << " -> " << node.right_->key_ << ";\n";
             print(*node.right_, file_name);
         }
         //std::cout << " }";
