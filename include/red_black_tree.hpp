@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <fstream>
+#include <cstdint>
 
 namespace Tree {
 
@@ -22,12 +23,12 @@ struct Node {
     Node(Key_t key) : key_(key), color(Color::red) {}
     Node() = default;
 
-    Node(const Node&& rhs) { // move ctor
+    Node(const Node&& rhs) { 
         key_ = rhs.key_;
         color = rhs.color;
     }
 
-    Node& operator=(const Node& rhs) {  // оператор присваивания
+    Node& operator=(const Node& rhs) {  
         if (this == &rhs) {
             return *this;
         }
@@ -38,15 +39,12 @@ struct Node {
         right_  = rhs.right_;
         return *this;
     }
-    void operator%(const Node& rhs) {
-        std::cout << "operator %\n";
-    }
 };
 
 /** @brief Red_black_tree - a class of spaces and methods of red-black tree.
  * Invariant - search, insert, delete time is O(logN)
  */
-template <typename Key_t>
+template <class Key_t>
 class Red_black_tree {
 
 public:
@@ -58,7 +56,7 @@ private:
     /** @brief method that sustains the balace invariant 
      *  @param node - new node, that was inserted 
      */
-    void fix_insert(std::shared_ptr<Node<Key_t>> node) {
+    void fix_insert(std::shared_ptr<Node<Key_t>>& node) {
 
         while (node != root_ && node->parent_->color == Color::red) {
 
@@ -107,7 +105,8 @@ private:
         root_->color = Color::black;
     }
 
-    void left_rotate(std::shared_ptr<Node<Key_t>> node) {
+    void left_rotate(const std::shared_ptr<Node<Key_t>> node) {
+
         auto y = node->right_;
         node->right_ = y->left_;
 
@@ -126,7 +125,8 @@ private:
         node->parent_ = y;
     }
 
-    void right_rotate(std::shared_ptr<Node<Key_t>> node) {
+    void right_rotate(const std::shared_ptr<Node<Key_t>> node) {
+
         auto y = node->left_;
         node->left_ = y->right_;
         if (y->right_) 
@@ -176,27 +176,19 @@ public:
         fix_insert(new_node);
     }
 
-    bool search(Key_t key1, Key_t key2) {
+    uint64_t search(Key_t key1, Key_t key2) const { 
 
         uint64_t counter = 0;
 
-        //std::shared_ptr<Node<Key_t>> node = root_;
-
         search_(root_, counter, key1, key2);
 
-        // while (node) { // для key1
-
-        //     if (key1 < *node) {
-        //         node = node->right_
-        //         counter++;
-        //     }
-        // }
-        std::cout << "counter = " << counter << std::endl;
-
-        return true;
+        // std::cout << counter << std::endl;
+        return counter;
     }
 
-    void search_(std::shared_ptr<Node<Key_t>> node, uint64_t& counter, Key_t key1, Key_t key2) {
+private:
+
+    void search_(const std::shared_ptr<Node<Key_t>>& node, uint64_t& counter, Key_t key1, Key_t key2) const {
 
         if (node->key_ >= key1 && node->key_ <= key2) {
             counter++;
@@ -214,47 +206,30 @@ public:
         return;
     }
 
+    std::shared_ptr<Node<Key_t>> lower_bound(Key_t key) const;
+    std::shared_ptr<Node<Key_t>> upper_bound(Key_t key) const; 
+
     void delete_node() {
 
     }
 
-    void print(Node<Key_t>& node, std::ofstream& file_name) {
-       // std::cout << " { " << node.key_ << " color: " << static_cast<int>(node.color);
+public:
+
+    static void create_graph_node(Node<Key_t>& node, std::ofstream& file_name) {
 
         if (node.left_) {
             file_name << node.key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.color) == 0 ? "DarkRed" : "black") << ", label = \"" <<  node.key_ << "\" ];\n"
                       << node.left_->key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.left_->color) == 0 ? "DarkRed" : "black") << ", label = \"" << node.left_->key_ << "\" ];\n"
                       << node.key_ << " -> " << node.left_->key_ << ";\n";
-            print(*node.left_, file_name);
+            create_graph_node(*node.left_, file_name);
         }
         if (node.right_) {
             file_name << node.key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.color) == 0 ? "DarkRed" : "black") << ", label = \"" <<  node.key_ << "\" ];\n"
                       << node.right_->key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.right_->color) == 0 ? "DarkRed" : "black") << ", label = \"" << node.right_->key_ << "\" ];\n"
                       << node.key_ << " -> " << node.right_->key_ << ";\n";
-            print(*node.right_, file_name);
+            create_graph_node(*node.right_, file_name);
         }
-        //std::cout << " }";
     }
-
-};
-
-
-template <typename Key_t>
-class binary_tree {
-
-    Node<Key_t> root_;
-    void print(Node<Key_t>& node) {
-        std::cout << " { " << node.key_;
-
-        if (node.left_) {
-            print(*node.left_);
-        }
-        if (node.right_) {
-            print(*node.right_);
-        }
-        std::cout << " }";
-    }
-
 
 };
 }
