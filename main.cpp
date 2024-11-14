@@ -29,10 +29,10 @@ int main() {
         }
         else if (mode == 'q') {
             if (!(std::cin >> a >> b).good())
-                break;
+                continue;
             if (a > b)  {
                 std::cout << "0\n";
-                break;
+                continue;
             }
             int64_t counter = rb_tree.search(a, b);
             std::cout << counter << std::endl;
