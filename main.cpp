@@ -11,12 +11,14 @@ int main() {
     
     char mode;
     
-    if ((std::cin >> mode).good() && mode == 'k') {
-        if (!(std::cin >> key).good())
-            return 0;
+    while ((std::cin >> mode).good()) {
+        if (mode == 'k') {
+            if ((std::cin >> key).good())
+                break;
+        }
+        else if (mode == 'q')
+            std::cout << '0';
     }
-    else 
-        return 0;
     Tree::Red_black_tree<int64_t> rb_tree{key};
 
     int64_t a = 0, b = 0;
@@ -31,15 +33,16 @@ int main() {
             if (!(std::cin >> a >> b).good())
                 continue;
             if (a > b)  {
-                std::cout << "0\n";
+                std::cout << '0';
                 continue;
             }
             int64_t counter = rb_tree.search(a, b);
-            std::cout << counter << std::endl;
+            std::cout << counter;
         }
         else 
             break;
     }
+    std::cout << std::endl;
     #ifndef NDEBUG
             /*   create a tree in graphviz   */
         std::ofstream file_graph;
