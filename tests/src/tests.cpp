@@ -13,7 +13,7 @@ int main() {
 
 void run_tests() {
 
-    const int TEST_NUM = 7;
+    const int TEST_NUM = 9;
 
     std::ifstream test_file;
     test_file.open("./tests/tests.txt");
@@ -25,7 +25,7 @@ void run_tests() {
 
     char mode;
     bool all_tests_pass = true;
-    int test_counter = 0;
+    int  test_counter = 0;
  
     for (int i = 0; i != TEST_NUM; ++i) {
 
@@ -45,10 +45,8 @@ void run_tests() {
                 test_file >> a >> b;
                     
                 int64_t counter;
-                if (a > b)  {
+                if (a > b) 
                     counter = 0;
-                    break;
-                } 
                 else 
                    counter = rb_tree.search(a, b);
 
@@ -60,9 +58,8 @@ void run_tests() {
                 ++test_counter;
                 break;
             }
-            else {
+            else 
                 break;
-            }
         }
     }
 

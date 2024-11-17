@@ -8,8 +8,7 @@
 int main() {
 
     int64_t key = 0;
-    
-    char mode;
+    char    mode;
     
     while ((std::cin >> mode).good()) {
         if (mode == 'k') {
@@ -22,7 +21,7 @@ int main() {
     Tree::Red_black_tree<int64_t> rb_tree{key};
 
     int64_t a = 0, b = 0;
-
+    
     while((std::cin >> mode).good()) {
         if (mode == 'k') {
             if (!(std::cin >> key).good())
