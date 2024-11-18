@@ -64,5 +64,6 @@ void run_tests() {
     }
 
     if (all_tests_pass)
-        std::cout << "-- All tests passed -- \n";
+       // std::cout << "-- All tests passed -- \n";
+       std::cout << "-1";
 }
