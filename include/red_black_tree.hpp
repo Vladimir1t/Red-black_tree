@@ -230,6 +230,5 @@ public:
             create_graph_node(*node.right_, file_name);
         }
     }
-
 };
 }
