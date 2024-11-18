@@ -4,21 +4,21 @@
 
 #include "red_black_tree.hpp"
 
-static void run_tests();
+static int run_tests();
 
 int main() {
 
-    run_tests();
+    return run_tests();
 }
 
-void run_tests() {
+int run_tests() {
 
     const int TEST_NUM = 9;
 
     std::ifstream test_file;
     test_file.open("./tests/tests.txt");
     if (!test_file.is_open())
-        return;
+        return -1;
 
     int64_t a = 0, b = 0;
     int64_t key, counter_ref;
@@ -63,7 +63,10 @@ void run_tests() {
         }
     }
 
-    if (all_tests_pass)
-       // std::cout << "-- All tests passed -- \n";
-       std::cout << "-1";
+    if (all_tests_pass) {
+        std::cout << "-- All tests passed -- \n";
+        return 0;
+    }
+    else 
+        return -1;
 }
