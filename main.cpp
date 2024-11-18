@@ -54,7 +54,7 @@ int main() {
                       "node [shape = record, tfillcolor = \"pink\", penwidth = 5, color = \"Cornsilk\", fontcolor = \"white\" ];\n"
                       "edge [style = filled ];\n";
                
-        rb_tree.create_graph_node(*rb_tree.root_, file_graph);
+        rb_tree.create_graph_node(*rb_tree.root, file_graph);
         file_graph << "}";
         file_graph.close();
         std::string graph_cmd = "dot -Tpng " + file_name + " -o " +
