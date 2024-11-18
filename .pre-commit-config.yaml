@@ -3,7 +3,7 @@ repos:
     hooks:
       - id: run-tests
         name: Run Tests
-        entry: ./run-tests.sh
+        entry: ./tests/run-tests.sh
         language: system
         pass_filenames: false
         stages: [pre-commit]
