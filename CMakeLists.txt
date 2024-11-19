@@ -11,6 +11,28 @@ set(test_srcs
     tests/src/tests.cpp
 )
 
+option(SET_MODE_ENABLED "Enable SET mode" OFF)
+
+set(CUSTOM_SET_VALUE "" CACHE STRING "Режим исполнения")
+
+if(SET_MODE_ENABLED)
+    message(STATUS "SET mode enabled")
+    add_definitions(-DSET_MODE_ENABLED)  
+else()
+    message(STATUS "SET mode not enabled")
+endif()
+
+if(CUSTOM_SET_VALUE STREQUAL "DEBUG")
+    message(STATUS "Custom mode: DEBUG")
+    add_compile_definitions(CUSTOM_MODE_DEBUG)
+elseif(CUSTOM_SET_VALUE STREQUAL "RELEASE")
+    message(STATUS "Custom mode: RELEASE")
+    add_compile_definitions(CUSTOM_MODE_RELEASE)
+else()
+    message(STATUS "Custom mode: Default")
+endif()
+
+
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -32,6 +54,7 @@ target_compile_options(rb_tree.x  PRIVATE "$<$<CONFIG:RELEASE>:${CMAKE_CXX_FLAGS
 target_compile_options(test.x  PRIVATE "$<$<CONFIG:RELEASE>:${CMAKE_CXX_FLAGS_RELEASE}>" ${FLAGS})
 
 # cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
+# cmake -DSET_MODE_ENABLED=ON -DCUSTOM_SET_VALUE=DEBUG -S . -B build
 # cmake --build build
 # cmake -DCMAKE_BUILD_TYPE=Release
 # ./build/rb_tree.x

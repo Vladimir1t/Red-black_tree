@@ -177,31 +177,31 @@ public:
         fix_insert(new_node);
     }
 
-    uint64_t search(Key_t key1, Key_t key2) const { 
+    uint64_t range_queries(Key_t key1, Key_t key2) const { 
 
         uint64_t counter = 0;
 
-        search_(root, counter, key1, key2);
+        search(root, counter, key1, key2);
 
         return counter;
     }
 
 private:
 
-    void search_(const std::shared_ptr<Node<Key_t>>& node, uint64_t& counter, Key_t key1, Key_t key2) const {
+    void search(const std::shared_ptr<Node<Key_t>>& node, uint64_t& counter, Key_t key1, Key_t key2) const {
 
         if (node->key_ >= key1 && node->key_ <= key2) {
             counter++;
             if (node->left_)
-                search_(node->left_, counter, key1, key2);
+                search(node->left_, counter, key1, key2);
             if (node->right_)
-            search_(node->right_, counter, key1, key2);
+            search(node->right_, counter, key1, key2);
         }
         else if (node->key_ < key1 && node->right_) {
-            search_(node->right_, counter, key1, key2);
+            search(node->right_, counter, key1, key2);
         }
         else if (node->key_ > key2 && node->left_) {
-            search_(node->left_, counter, key1, key2);
+            search(node->left_, counter, key1, key2);
         }
         return;
     }
