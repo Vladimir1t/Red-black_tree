@@ -48,7 +48,7 @@ int main() {
             if (a > b)  {
                 std::cout << "0 ";
                 #ifdef SET_MODE_ENABLED
-                    std::cout << "set = " << counter_set << ' ';
+                    std::cout << "set = " << "0 " << ' ';
                 #endif 
                 continue;
             }

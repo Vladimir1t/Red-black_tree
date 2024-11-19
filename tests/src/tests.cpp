@@ -1,11 +1,15 @@
 #include <iostream>
 #include <fstream>
 #include <cstdint>
+#include <chrono>
+#include <set>
+#include <string>
 
 #include "red_black_tree.hpp"
 
-static int run_tests();
-static int run_big_test();
+static int  run_tests();
+static int  run_big_test();
+static void range_queries_set(const std::string& file_name);
 
 int main() {
 
@@ -102,6 +106,9 @@ int run_big_test() {
     int64_t key, test_counter = 0;
     bool all_tests_pass = true;
 
+    #ifdef SET_MODE_ENABLED
+        auto start_rb = std::chrono::high_resolution_clock::now();
+    #endif
     char mode;
     test_file >> mode;
     if (mode != 'k')
@@ -138,6 +145,19 @@ int run_big_test() {
                 break;
         }
     }
+    test_file.close();
+
+    #ifdef SET_MODE_ENABLED
+        auto end_rb = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed_rb = end_rb - start_rb;
+        std::cout << "Program rb_tree execution time: " << elapsed_rb.count() << " seconds\n";
+   
+        auto start_set = std::chrono::high_resolution_clock::now();
+        range_queries_set("./tests/range_query_test.txt");
+        auto end_set = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed_set = end_set - start_set;
+        std::cout << "Program set execution time:     " << elapsed_set.count() << " seconds\n";
+    #endif
 
     if (all_tests_pass) {
         std::cout << "-- All big tests passed -- \n";
@@ -146,4 +166,40 @@ int run_big_test() {
     else 
         return -1;
 
+}
+void range_queries_set(const std::string& file_name) {
+
+    std::set<int64_t> set;
+
+    std::ifstream test_file;
+    test_file.open(file_name);
+    if (!test_file.is_open())
+        return;
+
+    char mode;
+    int64_t a, b, key;
+    while (!test_file.eof()) {
+
+        if (mode == 'k') {
+            test_file >> key;
+            set.insert(key);
+        }
+        else if (mode == 'q') {
+            test_file >> a >> b;
+                
+            int64_t counter;
+            if (a > b) 
+                counter = 0;
+            else {
+                auto l1 = set.lower_bound(a);
+                auto l2 = set.upper_bound(b);
+                if (std::distance(set.begin(), l1) > std::distance(set.begin(), l2))
+                    std::swap(l1, l2);
+                counter = std::distance(l1, l2);
+            }
+        }
+        else 
+            break;
+    }
+    test_file.close();
 }
