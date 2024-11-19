@@ -9,7 +9,7 @@ static int run_big_test();
 
 int main() {
 
-    return run_tests() | run_big_test();
+    return run_tests() + run_big_test();
 }
 
 int run_tests() {
