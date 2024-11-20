@@ -23,7 +23,13 @@ jobs:
           sudo apt update
           sudo apt install -y build-essential
 
-      # Шаг 3: Сборка и выполнение тестов
+      # 3. Сборка проекта
+      - name: Build project
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
+          cmake --build build
+
+      # Шаг 4: Сборка и выполнение тестов
       - name: Run tests
         run: |
           chmod +x tests/run-tests.sh
