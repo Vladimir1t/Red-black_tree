@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 ./build/test.x
 
 if [ $? -ne 0 ]; then
