@@ -1,0 +1,30 @@
+name: Test Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Шаг 1: Клонирование репозитория
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Шаг 2: Установка зависимостей (если требуется)
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential
+
+      # Шаг 3: Сборка и выполнение тестов
+      - name: Run tests
+        run: |
+          chmod +x tests/run-tests.sh
+          ./tests/run-tests.sh
