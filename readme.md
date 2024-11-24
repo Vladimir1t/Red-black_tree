@@ -44,7 +44,7 @@ This project implements a Red-Black Tree with range query support, along with op
 1. Clone the repository.
 2. Create a build directory and navigate into it:
    ```bash
-   mkdir build && cd build
+   mkdir build
    ```
 3. Configure the project using CMake:
    ```bash
