@@ -20,26 +20,9 @@ struct Node {
     Color color_;
     Key_t key_;
 
-    Node(Key_t key) : key_(key), color_(Color::red) {}
+    Node(Key_t key) : key_(key) { color_ = Color::red; }
+    Node(Key_t key, Color color) : key_(key), color_(color) {}
     Node() = default;
-
-    Node(const Node&& rhs) { 
-        key_ = rhs.key_;
-        color_ = rhs.color_;
-    }
-
-    Node& operator=(const Node& rhs) {  
-        if (this == &rhs) {
-            return *this;
-        }
-        key_    = rhs.key_;
-        color_  = rhs.color_;
-        parent_ = rhs.parent_;
-        left_   = rhs.left_;
-        right_  = rhs.right_;
-
-        return *this;
-    }
 };
 
 /** @brief Red_black_tree - a class of spaces and methods of red-black tree.
@@ -48,18 +31,16 @@ struct Node {
 template <class Key_t>
 class Red_black_tree {
 
-public:
-
-    std::shared_ptr<Node<Key_t>> root = nullptr;
-
 private:
+
+    std::shared_ptr<Node<Key_t>> root_ = nullptr;
 
     /** @brief method that sustains the balace invariant 
      *  @param node - new node, that was inserted 
      */
-    void fix_insert(std::shared_ptr<Node<Key_t>>& node) {
+    void fix_insert(std::shared_ptr<Node<Key_t>> node) {
 
-        while (node != root && node->parent_->color_ == Color::red) {
+        while (node != root_ && node->parent_->color_ == Color::red) {
 
             if (node->parent_ && node->parent_->parent_) {
 
@@ -103,7 +84,7 @@ private:
                 }
             }
         }
-        root->color_ = Color::black;
+        root_->color_ = Color::black;
     }
 
     void left_rotate(const std::shared_ptr<Node<Key_t>> node) {
@@ -116,7 +97,7 @@ private:
         y->parent_ = node->parent_;
 
         if (!node->parent_) 
-            root = y;
+            root_ = y;
         else if (node == node->parent_->left_) 
             node->parent_->left_ = y;
         else 
@@ -134,7 +115,7 @@ private:
             y->right_->parent_ = node;
         y->parent_ = node->parent_;
         if (!node->parent_) 
-            root = y;
+            root_ = y;
         else if (node == node->parent_->right_) 
             node->parent_->right_ = y;
         else 
@@ -145,14 +126,18 @@ private:
 
 public:
     Red_black_tree(Key_t key) {
-        root = std::make_shared<Node<Key_t>>(key);
-        root->color_ = Color::black;
+        root_ = std::make_shared<Node<Key_t>>(key, Color::black);
+    }
+    Red_black_tree() = default;
+
+    std::shared_ptr<Node<Key_t>> get_root() {
+        return root_;
     }
 
     void insert_elem(Key_t key) {
 
         auto new_node = std::make_shared<Node<Key_t>>(key);
-        auto current = root;
+        auto current = root_;
         std::shared_ptr<Node<Key_t>> parent = nullptr;
 
         while (current) {
@@ -167,7 +152,7 @@ public:
 
         new_node->parent_ = parent;
         if (!parent) 
-            root = new_node;
+            root_ = new_node;
         else if (key < parent->key_) 
             parent->left_ = new_node;
         else 
@@ -181,14 +166,14 @@ public:
 
         uint64_t counter = 0;
 
-        search(root, counter, key1, key2);
+        search(root_, counter, key1, key2);
 
         return counter;
     }
 
 private:
 
-    void search(const std::shared_ptr<Node<Key_t>>& node, uint64_t& counter, Key_t key1, Key_t key2) const {
+    void search(const std::shared_ptr<Node<Key_t>> node, uint64_t& counter, Key_t key1, Key_t key2) const {
 
         if (node->key_ >= key1 && node->key_ <= key2) {
             counter++;
@@ -215,6 +200,11 @@ private:
 
 public:
 
+    void create_graph(std::ofstream& file_name) const {
+
+        create_graph_node(*root_, file_name);
+    }
+
     static void create_graph_node(Node<Key_t>& node, std::ofstream& file_name) {
 
         if (node.left_) {
@@ -230,5 +220,70 @@ public:
             create_graph_node(*node.right_, file_name);
         }
     }
+};
+}
+
+namespace Range_queries {
+
+enum class Mode {
+    cin,
+    file
+};
+
+template<typename Key_t>
+class range_quries {
+
+public:
+
+Tree::Red_black_tree<Key_t> rb_tree;
+
+void add_element(Mode mode) {
+
+    Key_t key;
+
+    switch(mode) {
+        case Mode::cin:
+            if (!(std::cin >> key).good())
+                    throw std::invalid_argument("worng value");
+            else if (rb_tree.get_root() == nullptr) {
+                Tree::Red_black_tree<Key_t> new_tree{key};
+                rb_tree = new_tree;
+            }
+            #ifdef SET_MODE_ENABLED
+                set.insert(key); 
+            #endif
+            rb_tree.insert_elem(key);
+            break;
+
+        case Mode::file:
+            break;
+    }
+}
+
+int64_t find_range_elements(Mode mode) {
+
+    int64_t a, b;
+
+    if (!(std::cin >> a >> b).good()) 
+        throw std::invalid_argument("wrong value");
+    if (a > b)  {
+        //std::cout << "0 ";
+        return 0;
+        #ifdef SET_MODE_ENABLED
+            std::cout << "set = " << "0 " << ' ';
+        #endif 
+    }
+    else if (rb_tree.get_root() == nullptr) {
+        return 0;
+    }
+
+    int64_t counter = rb_tree.range_queries(a, b);
+    //std::cout << counter << ' ';
+    #ifdef SET_MODE_ENABLED
+        int64_t counter_set = range_queries_set(set, a, b);
+        std::cout << "set = " << counter_set << ' ';
+    #endif 
+    return counter;
+}
 };
 }

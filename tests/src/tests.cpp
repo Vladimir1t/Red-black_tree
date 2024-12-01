@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdint>
+#include <filesystem>
 #include <chrono>
 #include <set>
 #include <string>
@@ -79,7 +80,8 @@ int run_tests() {
 int run_big_test() {
 
     std::ifstream test_file;
-    test_file.open("./tests/range_query_test.txt");
+    std::filesystem::path file_name = "./tests/range_query_test.txt";
+    test_file.open(file_name);
     if (!test_file.is_open())
         return -1;
     const int64_t ref_array[] = {606, 56, 727, 724, 135, 752, 468, 158, 650, 743, 208, 406, 514, 627, 493, 883, 91, 199, 278, 265, 
@@ -121,28 +123,32 @@ int run_big_test() {
 
         while((test_file >> mode).good()) {
 
-            if (mode == 'k') {
-                test_file >> key;
-                rb_tree.insert_elem(key);
-            }
-            else if (mode == 'q') {
-                test_file >> a >> b;
-                    
-                int64_t counter;
-                if (a > b) 
-                    counter = 0;
-                else 
-                   counter = rb_tree.range_queries(a, b);
+            switch(mode) {
+                case 'k':
+                    test_file >> key;
+                    rb_tree.insert_elem(key);
+                    break;
+                
+                case 'q':
+                    test_file >> a >> b;
 
-                if (counter != ref_array[test_counter]) {
-                    std::cout << "test [" << test_counter << "] failed \n";
-                    all_tests_pass = false;
-                }
-                ++test_counter;
-                break;
-            }
-            else 
-                break;
+                    int64_t counter;
+                    if (a > b) 
+                        counter = 0;
+                    else 
+                       counter = rb_tree.range_queries(a, b);
+
+                    if (counter != ref_array[test_counter]) {
+                        std::cout << "test [" << test_counter << "] failed \n";
+                        all_tests_pass = false;
+                    }
+                    ++test_counter;
+                    break;
+
+                default:
+                    throw std::invalid_argument("wrong mode");
+                    break;
+            } 
         }
     }
     test_file.close();
