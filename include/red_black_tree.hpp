@@ -191,13 +191,6 @@ private:
         return;
     }
 
-    std::shared_ptr<Node<Key_t>> lower_bound(Key_t key) const;
-    std::shared_ptr<Node<Key_t>> upper_bound(Key_t key) const; 
-
-    void delete_node() {
-
-    }
-
 public:
 
     void create_graph(std::ofstream& file_name) const {
@@ -239,28 +232,49 @@ Tree::Red_black_tree<Key_t> rb_tree;
 
 void add_element(Mode mode) {
 
+    if (mode != Mode::cin)
+        throw std::invalid_argument("file mode without file.txt");
+
+    Key_t key;
+    
+    if (!(std::cin >> key).good())
+            throw std::invalid_argument("worng value");
+    else if (rb_tree.get_root() == nullptr) {
+        Tree::Red_black_tree<Key_t> new_tree{key};
+        rb_tree = new_tree;
+    }
+
+    #ifdef SET_MODE_ENABLED
+        set.insert(key); 
+    #endif
+
+    rb_tree.insert_elem(key);
+}
+void add_element(Mode mode, std::ifstream& file) {
+
+    if (mode != Mode::file)
+        throw std::invalid_argument("cin mode with file.txt");
+
     Key_t key;
 
-    switch(mode) {
-        case Mode::cin:
-            if (!(std::cin >> key).good())
-                    throw std::invalid_argument("worng value");
-            else if (rb_tree.get_root() == nullptr) {
-                Tree::Red_black_tree<Key_t> new_tree{key};
-                rb_tree = new_tree;
-            }
-            #ifdef SET_MODE_ENABLED
-                set.insert(key); 
-            #endif
-            rb_tree.insert_elem(key);
-            break;
-
-        case Mode::file:
-            break;
+    if (!(file >> key).good())
+            throw std::invalid_argument("worng value");
+    else if (rb_tree.get_root() == nullptr) {
+        Tree::Red_black_tree<Key_t> new_tree{key};
+        rb_tree = new_tree;
     }
+
+    #ifdef SET_MODE_ENABLED
+        set.insert(key); 
+    #endif
+
+    rb_tree.insert_elem(key);
 }
 
 int64_t find_range_elements(Mode mode) {
+
+    if (mode != Mode::file)
+        throw std::invalid_argument("file mode without file.txt");
 
     int64_t a, b;
 
@@ -278,7 +292,33 @@ int64_t find_range_elements(Mode mode) {
     }
 
     int64_t counter = rb_tree.range_queries(a, b);
-    //std::cout << counter << ' ';
+    #ifdef SET_MODE_ENABLED
+        int64_t counter_set = range_queries_set(set, a, b);
+        std::cout << "set = " << counter_set << ' ';
+    #endif 
+    return counter;
+}
+int64_t find_range_elements(Mode mode, std::ifstream& file) {
+
+    if (mode != Mode::file)
+        throw std::invalid_argument("cin mode with file.txt");
+
+    int64_t a, b;
+
+    if (!(file >> a >> b).good()) 
+        throw std::invalid_argument("wrong value");
+    if (a > b)  {
+        //std::cout << "0 ";
+        return 0;
+        #ifdef SET_MODE_ENABLED
+            std::cout << "set = " << "0 " << ' ';
+        #endif 
+    }
+    else if (rb_tree.get_root() == nullptr) {
+        return 0;
+    }
+
+    int64_t counter = rb_tree.range_queries(a, b);
     #ifdef SET_MODE_ENABLED
         int64_t counter_set = range_queries_set(set, a, b);
         std::cout << "set = " << counter_set << ' ';

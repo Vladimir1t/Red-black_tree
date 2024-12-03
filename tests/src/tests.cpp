@@ -22,7 +22,8 @@ int run_tests() {
     const int TEST_NUM = 9;
 
     std::ifstream test_file;
-    test_file.open("./tests/tests.txt");
+    std::filesystem::path file_name = "./tests/tests.txt";
+    test_file.open(file_name);
     if (!test_file.is_open())
         return -1;
 
@@ -34,28 +35,17 @@ int run_tests() {
     int  test_counter = 0;
  
     for (int i = 0; i != TEST_NUM; ++i) {
+        
+        Range_queries::range_quries<int64_t> range_quer;
 
-        test_file >> mode;
-        if (mode != 'k')
-            break;
-        test_file >> key;
-        Tree::Red_black_tree<int64_t> rb_tree{key};
+        int64_t a = 0, b = 0;
 
-        while(test_file >> mode) {
-
+        while((test_file >> mode).good()) {
             if (mode == 'k') {
-                test_file >> key;
-                rb_tree.insert_elem(key);
+                range_quer.add_element(Range_queries::Mode::file, test_file);
             }
-            else if (mode == 'q') {
-                test_file >> a >> b;
-                    
-                int64_t counter;
-                if (a > b) 
-                    counter = 0;
-                else 
-                   counter = rb_tree.range_queries(a, b);
-
+            else if (mode == 'q') { 
+                int64_t counter = range_quer.find_range_elements(Range_queries::Mode::file, test_file); 
                 test_file >> counter_ref;
                 if (counter != counter_ref) {
                     std::cout << "test [" << test_counter << "] failed \n";
@@ -64,8 +54,10 @@ int run_tests() {
                 ++test_counter;
                 break;
             }
-            else 
-                break;
+            else {  
+                throw std::invalid_argument("wrong mode value");
+                return -1;
+            }
         }
     }
 
@@ -112,47 +104,28 @@ int run_big_test() {
         auto start_rb = std::chrono::high_resolution_clock::now();
     #endif
     char mode;
-    test_file >> mode;
-    if (mode != 'k')
-        return -1;
+    Range_queries::range_quries<int64_t> range_quer;
 
-    test_file >> key;
-    Tree::Red_black_tree<int64_t> rb_tree{key};
-
-    while (!test_file.eof()) {
-
-        while((test_file >> mode).good()) {
-
-            switch(mode) {
-                case 'k':
-                    test_file >> key;
-                    rb_tree.insert_elem(key);
-                    break;
-                
-                case 'q':
-                    test_file >> a >> b;
-
-                    int64_t counter;
-                    if (a > b) 
-                        counter = 0;
-                    else 
-                       counter = rb_tree.range_queries(a, b);
-
-                    if (counter != ref_array[test_counter]) {
-                        std::cout << "test [" << test_counter << "] failed \n";
-                        all_tests_pass = false;
-                    }
-                    ++test_counter;
-                    break;
-
-                default:
-                    throw std::invalid_argument("wrong mode");
-                    break;
-            } 
+    while((test_file >> mode).good()) {
+        if (mode == 'k') {
+            range_quer.add_element(Range_queries::Mode::file, test_file);
+        }
+        else if (mode == 'q') { 
+            int64_t counter = range_quer.find_range_elements(Range_queries::Mode::file, test_file); 
+            if (counter != ref_array[test_counter]) {
+                std::cout << "test [" << test_counter << "] failed \n";
+                all_tests_pass = false;
+            }
+            ++test_counter;
+            break;
+        }
+        else {  
+            throw std::invalid_argument("wrong mode value");
+            return -1;
         }
     }
     test_file.close();
-
+   
     #ifdef SET_MODE_ENABLED
         auto end_rb = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed_rb = end_rb - start_rb;
