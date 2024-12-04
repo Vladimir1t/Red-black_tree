@@ -37,17 +37,16 @@ jobs:
           fi
 
       # 3. Установка зависимостей (Windows)
-    - name: Install dependencies (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
-        choco install mingw -y
-        git clone https://github.com/google/googletest.git
-        cd googletest
-        cmake -S . -B build -DCMAKE_INSTALL_PREFIX="C:/gtest"
-        cmake --build build --target install
-        [Environment]::SetEnvironmentVariable("PATH", $env:PATH + ";C:/gtest/bin", [EnvironmentVariableTarget]::Process)
-    
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
+          choco install mingw -y
+          git clone https://github.com/google/googletest.git
+          cd googletest
+          cmake -S . -B build -DCMAKE_INSTALL_PREFIX="C:/gtest"
+          cmake --build build --target install
+          [Environment]::SetEnvironmentVariable("PATH", $env:PATH + ";C:/gtest/bin", [EnvironmentVariableTarget]::Process)
 
       # 4. Сборка проекта
       - name: Build project
