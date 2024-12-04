@@ -52,11 +52,11 @@ jobs:
       - name: Build project
         run: |
           mkdir build
-          cmake -DCMAKE_BUILD_TYPE=Release -S . -B build -DGTEST_ROOT="C:/gtest" -DGTEST_LIBRARIES="C:/gtest/lib" -DGTEST_INCLUDE_DIRS="C:/gtest/include"
+          cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
           cmake --build build
 
       # 5. Запуск тестов
       - name: Run tests
         run: |
-          cd build
-          ctest --output-on-failure
+          chmod +x tests/run-tests.sh || true
+          ./tests/run-tests.sh || exit 1
