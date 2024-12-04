@@ -9,6 +9,8 @@
 
 #include "red_black_tree.hpp"
 
+void range_queries_set(const std::string& file_name);
+
 TEST(ALGORITHM_TEST, small_tests) {
     const int TEST_NUM = 9;
 
@@ -127,7 +129,7 @@ void range_queries_set(const std::string& file_name) {
 
     char mode;
     int64_t a, b, key;
-    while (!test_file.eof() && (test_file >> mode).good) {
+    while (!test_file.eof() && (test_file >> mode).good()) {
 
         if (mode == 'k') {
             test_file >> key;
