@@ -251,10 +251,6 @@ void add_element(Mode mode) {
         rb_tree = new_tree;
     }
 
-    #ifdef SET_MODE_ENABLED
-        set.insert(key); 
-    #endif
-
     rb_tree.insert_elem(key);
 }
 void add_element(Mode mode, std::ifstream& file) {
@@ -271,10 +267,6 @@ void add_element(Mode mode, std::ifstream& file) {
         rb_tree = new_tree;
     }
 
-    #ifdef SET_MODE_ENABLED
-        set.insert(key); 
-    #endif
-
     rb_tree.insert_elem(key);
 }
 
@@ -290,19 +282,13 @@ int64_t find_range_elements(Mode mode) {
     if (a > b)  {
         //std::cout << "0 ";
         return 0;
-        #ifdef SET_MODE_ENABLED
-            std::cout << "set = " << "0 " << ' ';
-        #endif 
     }
     else if (rb_tree.get_root() == nullptr) {
         return 0;
     }
 
     int64_t counter = rb_tree.range_queries(a, b);
-    #ifdef SET_MODE_ENABLED
-        int64_t counter_set = range_queries_set(set, a, b);
-        std::cout << "set = " << counter_set << ' ';
-    #endif 
+    
     return counter;
 }
 int64_t find_range_elements(Mode mode, std::ifstream& file) {
@@ -317,19 +303,13 @@ int64_t find_range_elements(Mode mode, std::ifstream& file) {
     if (a > b)  {
         //std::cout << "0 ";
         return 0;
-        #ifdef SET_MODE_ENABLED
-            std::cout << "set = " << "0 " << ' ';
-        #endif 
     }
     else if (rb_tree.get_root() == nullptr) {
         return 0;
     }
 
     int64_t counter = rb_tree.range_queries(a, b);
-    #ifdef SET_MODE_ENABLED
-        int64_t counter_set = range_queries_set(set, a, b);
-        std::cout << "set = " << counter_set << ' ';
-    #endif 
+    
     return counter;
 }
 };
