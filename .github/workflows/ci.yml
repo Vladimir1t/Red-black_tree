@@ -55,7 +55,11 @@ jobs:
       - name: Build project
         run: |
           mkdir build
-          cmake -DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake" -S . -B build
+          if [ "${{ matrix.os }}" == "macos-latest" ]; then
+            cmake -S . -B build
+          else
+            cmake -DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake" -S . -B build
+          fi
           cmake --build build
 
       # 5. Запуск тестов
