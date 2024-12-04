@@ -20,51 +20,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Установка зависимостей (Linux & macOS)
-      - name: Install dependencies (Linux & macOS)
-        if: runner.os != 'Windows'
-        run: |
-          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            sudo apt update
-            sudo apt install -y build-essential cmake libgtest-dev
-            cd /usr/src/gtest
-            sudo cmake -S . -B build
-            sudo cmake --build build
-            sudo cp build/lib/*.a /usr/lib/
-          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
-            # Установим необходимые зависимости через Homebrew для macOS
-            brew update
-            brew install cmake googletest
-            # Убедитесь, что установлены Xcode Command Line Tools
-            xcode-select --install
-          fi
-
-      # 3. Установка зависимостей (Windows)
-      - name: Install dependencies (Windows)
+      # 2. Установка CMake (если требуется)
+      - name: Install CMake (Windows only)
         if: runner.os == 'Windows'
         run: |
-          # Установка CMake и vcpkg для Windows
           choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
-          choco install vcpkg -y
-          vcpkg install gtest
 
-          # Установка переменной окружения для vcpkg
-          echo "::add-path::C:\Program Files (x86)\vcpkg"
-          echo "CMake settings: -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
-
-      # 4. Сборка проекта
+      # 3. Сборка проекта
       - name: Build project
         run: |
           mkdir build
-          if [ "${{ matrix.os }}" == "macos-latest" ]; then
-            # Для macOS не нужно использовать toolchain от vcpkg
-            cmake -S . -B build
-          else
-            cmake -DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake" -S . -B build
-          fi
+          cmake -S . -B build
           cmake --build build
 
-      # 5. Запуск тестов
+      # 4. Запуск тестов
       - name: Run tests
         run: |
           cd build
