@@ -5,33 +5,23 @@
 #include <chrono>
 #include <set>
 #include <string>
+#include <gtest/gtest.h>
 
 #include "red_black_tree.hpp"
 
-static int  run_tests();
-static int  run_big_test();
-static void range_queries_set(const std::string& file_name);
-
-int main() {
-
-    return run_tests() + run_big_test();
-}
-
-int run_tests() {
-
+TEST(ALGORITHM_TEST, small_tests) {
     const int TEST_NUM = 9;
 
     std::ifstream test_file;
     std::filesystem::path file_name = "./tests/tests.txt";
     test_file.open(file_name);
     if (!test_file.is_open())
-        return -1;
-
+        throw std::invalid_argument("wrong file name");
+   
     int64_t a = 0, b = 0;
     int64_t key, counter_ref;
 
     char mode;
-    bool all_tests_pass = true;
     int  test_counter = 0;
  
     for (int i = 0; i != TEST_NUM; ++i) {
@@ -47,35 +37,26 @@ int run_tests() {
             else if (mode == 'q') { 
                 int64_t counter = range_quer.find_range_elements(Range_queries::Mode::file, test_file); 
                 test_file >> counter_ref;
-                if (counter != counter_ref) {
-                    std::cout << "test [" << test_counter << "] failed \n";
-                    all_tests_pass = false;
-                }
+                EXPECT_EQ(counter, counter_ref);
+
                 ++test_counter;
                 break;
             }
             else {  
                 throw std::invalid_argument("wrong mode value");
-                return -1;
             }
         }
     }
-
-    if (all_tests_pass) {
-        std::cout << "-- All tests passed -- \n";
-        return 0;
-    }
-    else 
-        return -1;
 }
 
-int run_big_test() {
+TEST(BIG_TEST, big_test) {
 
     std::ifstream test_file;
     std::filesystem::path file_name = "./tests/range_query_test.txt";
     test_file.open(file_name);
     if (!test_file.is_open())
-        return -1;
+        throw std::invalid_argument("wrong file name");
+
     const int64_t ref_array[] = {606, 56, 727, 724, 135, 752, 468, 158, 650, 743, 208, 406, 514, 627, 493, 883, 91, 199, 278, 265, 
         60, 203, 534, 374, 249, 563, 736, 366, 20, 345, 223, 224, 513, 640, 539, 614, 471, 200, 195, 467, 113, 541, 305, 779, 69, 
         93, 102, 268, 231, 437, 383, 1, 246, 96, 133, 260, 32, 130, 763, 586, 341, 371, 80, 574, 633, 322, 126, 107, 179, 326, 313, 
@@ -112,16 +93,13 @@ int run_big_test() {
         }
         else if (mode == 'q') { 
             int64_t counter = range_quer.find_range_elements(Range_queries::Mode::file, test_file); 
-            if (counter != ref_array[test_counter]) {
-                std::cout << "test [" << test_counter << "] failed \n";
-                all_tests_pass = false;
-            }
+            EXPECT_EQ(counter, ref_array[test_counter]);
+            
             ++test_counter;
             break;
         }
         else {  
             throw std::invalid_argument("wrong mode value");
-            return -1;
         }
     }
     test_file.close();
@@ -137,14 +115,6 @@ int run_big_test() {
         std::chrono::duration<double> elapsed_set = end_set - start_set;
         std::cout << "Program set execution time:     " << elapsed_set.count() << " seconds\n";
     #endif
-
-    if (all_tests_pass) {
-        std::cout << "-- All big tests passed -- \n";
-        return 0;
-    }
-    else 
-        return -1;
-
 }
 void range_queries_set(const std::string& file_name) {
 
@@ -157,7 +127,7 @@ void range_queries_set(const std::string& file_name) {
 
     char mode;
     int64_t a, b, key;
-    while (!test_file.eof()) {
+    while (!test_file.eof() && (test_file >> mode).good) {
 
         if (mode == 'k') {
             test_file >> key;

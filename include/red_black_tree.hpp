@@ -29,7 +29,7 @@ struct Node {
  * Invariant - search, insert, delete time is O(logN)
  */
 template <class Key_t>
-class Red_black_tree {
+class Red_black_tree final {
 
 private:
 
@@ -42,49 +42,52 @@ private:
 
         while (node != root_ && node->parent_->color_ == Color::red) {
 
-            if (node->parent_ && node->parent_->parent_) {
+            if (!node->parent_ || !node->parent_->parent_) 
+                continue;
 
-                if (node->parent_ == node->parent_->parent_->left_) {
-                    auto uncle = node->parent_->parent_->right_;
+            if (node->parent_ == node->parent_->parent_->left_) {
 
-                    if (uncle && uncle->color_ == Color::red) {
-                        node->parent_->color_ = Color::black;
-                        uncle->color_ = Color::black;
-                        node->parent_->parent_->color_ = Color::red;
-                        node = node->parent_->parent_;
+                auto uncle = node->parent_->parent_->right_;
+
+                if (uncle && uncle->color_ == Color::red) {
+                    fix_insert_without_rotate(node, uncle);
+                }
+                else {
+                    if (node == node->parent_->right_) {
+                        node = node->parent_;
+                        left_rotate(node);
                     }
-                    else {
-                        if (node == node->parent_->right_) {
-                            node = node->parent_;
-                            left_rotate(node);
-                        }
-                        node->parent_->color_ = Color::black;
-                        node->parent_->parent_->color_ = Color::red;
-                        right_rotate(node->parent_->parent_);
-                    }
+                    node->parent_->color_ = Color::black;
+                    node->parent_->parent_->color_ = Color::red;
+                    right_rotate(node->parent_->parent_);
+                }
+            } 
+            else {
+                auto uncle = node->parent_->parent_->left_;
+
+                if (uncle && uncle->color_ == Color::red) {
+                    fix_insert_without_rotate(node, uncle);
                 } 
                 else {
-                    auto uncle = node->parent_->parent_->left_;
-
-                    if (uncle && uncle->color_ == Color::red) {
-                        node->parent_->color_ = Color::black;
-                        uncle->color_ = Color::black;
-                        node->parent_->parent_->color_ = Color::red;
-                        node = node->parent_->parent_;
-                    } 
-                    else {
-                        if (node == node->parent_->left_) {
-                            node = node->parent_;
-                            right_rotate(node);
-                        }
-                        node->parent_->color_ = Color::black;
-                        node->parent_->parent_->color_ = Color::red;
-                        left_rotate(node->parent_->parent_);
+                    if (node == node->parent_->left_) {
+                        node = node->parent_;
+                        right_rotate(node);
                     }
+                    node->parent_->color_ = Color::black;
+                    node->parent_->parent_->color_ = Color::red;
+                    left_rotate(node->parent_->parent_);
                 }
             }
+            
         }
         root_->color_ = Color::black;
+    }
+
+    void fix_insert_without_rotate(std::shared_ptr<Node<Key_t>> node, std::shared_ptr<Node<Key_t>> uncle) {
+        node->parent_->color_ = Color::black;
+        uncle->color_ = Color::black;
+        node->parent_->parent_->color_ = Color::red;
+        node = node->parent_->parent_;
     }
 
     void left_rotate(const std::shared_ptr<Node<Key_t>> node) {
@@ -201,14 +204,18 @@ public:
     static void create_graph_node(Node<Key_t>& node, std::ofstream& file_name) {
 
         if (node.left_) {
-            file_name << node.key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.color_) == 0 ? "DarkRed" : "black") << ", label = \"" <<  node.key_ << "\" ];\n"
-                      << node.left_->key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.left_->color_) == 0 ? "DarkRed" : "black") << ", label = \"" << node.left_->key_ << "\" ];\n"
+            file_name << node.key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.color_) == 0 ?
+                                                                    "DarkRed" : "black") << ", label = \"" <<  node.key_ << "\" ];\n"
+                      << node.left_->key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.left_->color_) == 0 ?
+                                                                    "DarkRed" : "black") << ", label = \"" << node.left_->key_ << "\" ];\n"
                       << node.key_ << " -> " << node.left_->key_ << ";\n";
             create_graph_node(*node.left_, file_name);
         }
         if (node.right_) {
-            file_name << node.key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.color_) == 0 ? "DarkRed" : "black") << ", label = \"" <<  node.key_ << "\" ];\n"
-                      << node.right_->key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.right_->color_) == 0 ? "DarkRed" : "black") << ", label = \"" << node.right_->key_ << "\" ];\n"
+            file_name << node.key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.color_) == 0 ? 
+                                                                    "DarkRed" : "black") << ", label = \"" <<  node.key_ << "\" ];\n"
+                      << node.right_->key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.right_->color_) == 0 ? 
+                                                                    "DarkRed" : "black") << ", label = \"" << node.right_->key_ << "\" ];\n"
                       << node.key_ << " -> " << node.right_->key_ << ";\n";
             create_graph_node(*node.right_, file_name);
         }
@@ -224,7 +231,7 @@ enum class Mode {
 };
 
 template<typename Key_t>
-class range_quries {
+class range_quries final {
 
 public:
 
