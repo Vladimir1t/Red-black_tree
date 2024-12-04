@@ -52,7 +52,7 @@ jobs:
       - name: Build project
         run: |
           mkdir build
-          cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
+          cmake -DCMAKE_BUILD_TYPE=Release -S . -B build -DGTEST_ROOT="C:/gtest" -DGTEST_LIBRARIES="C:/gtest/lib" -DGTEST_INCLUDE_DIRS="C:/gtest/include"
           cmake --build build
 
       # 5. Запуск тестов
