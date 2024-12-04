@@ -40,19 +40,22 @@ jobs:
       - name: Install dependencies (Windows)
         if: runner.os == 'Windows'
         run: |
+          # Установка CMake
           choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
-          choco install mingw -y
+          
+          # Установка GoogleTest с использованием vcpkg
+          choco install vcpkg -y
           vcpkg install gtest
-          setx VCPKG_ROOT "C:\path\to\vcpkg"
-          mkdir build
-          cd build
-          cmake --build .
+
+          # Настройка vcpkg и CMake
+          echo "::add-path::C:\Program Files (x86)\vcpkg"
+          echo "CMake settings: -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
       # 4. Сборка проекта
       - name: Build project
         run: |
           mkdir build
-          cmake -DCMAKE_BUILD_TYPE=Release -S . -B build -DGTEST_ROOT="C:/gtest" -DGTEST_LIBRARIES="C:/gtest/lib" -DGTEST_INCLUDE_DIRS="C:/gtest/include"
+          cmake -DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake" -S . -B build
           cmake --build build
 
       # 5. Запуск тестов
