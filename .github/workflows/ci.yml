@@ -32,22 +32,23 @@ jobs:
             sudo cmake --build build
             sudo cp build/lib/*.a /usr/lib/
           elif [ "${{ matrix.os }}" == "macos-latest" ]; then
+            # Установим необходимые зависимости через Homebrew для macOS
             brew update
             brew install cmake googletest
+            # Убедитесь, что установлены Xcode Command Line Tools
+            xcode-select --install
           fi
 
       # 3. Установка зависимостей (Windows)
       - name: Install dependencies (Windows)
         if: runner.os == 'Windows'
         run: |
-          # Установка CMake
+          # Установка CMake и vcpkg для Windows
           choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
-          
-          # Установка GoogleTest с использованием vcpkg
           choco install vcpkg -y
           vcpkg install gtest
 
-          # Настройка vcpkg и CMake
+          # Установка переменной окружения для vcpkg
           echo "::add-path::C:\Program Files (x86)\vcpkg"
           echo "CMake settings: -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
@@ -56,6 +57,7 @@ jobs:
         run: |
           mkdir build
           if [ "${{ matrix.os }}" == "macos-latest" ]; then
+            # Для macOS не нужно использовать toolchain от vcpkg
             cmake -S . -B build
           else
             cmake -DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake" -S . -B build
