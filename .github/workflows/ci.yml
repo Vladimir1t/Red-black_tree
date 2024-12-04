@@ -20,20 +20,42 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Установка CMake (если требуется)
-      - name: Install CMake (Windows only)
+      # 2. Установка зависимостей (Linux & macOS)
+      - name: Install dependencies (Linux & macOS)
+        if: runner.os != 'Windows'
+        run: |
+          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+            sudo apt update
+            sudo apt install -y build-essential cmake libgtest-dev
+            cd /usr/src/gtest
+            sudo cmake -S . -B build
+            sudo cmake --build build
+            sudo cp build/lib/*.a /usr/lib/
+          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
+            brew update
+            brew install cmake googletest
+          fi
+
+      # 3. Установка зависимостей (Windows)
+      - name: Install dependencies (Windows)
         if: runner.os == 'Windows'
         run: |
           choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
+          choco install mingw -y
+          git clone https://github.com/google/googletest.git
+          cd googletest
+          cmake -S . -B build -DCMAKE_INSTALL_PREFIX="C:/gtest"
+          cmake --build build --target install
+          [Environment]::SetEnvironmentVariable("PATH", $env:PATH + ";C:/gtest/bin", [EnvironmentVariableTarget]::Process)
 
-      # 3. Сборка проекта
+      # 4. Сборка проекта
       - name: Build project
         run: |
           mkdir build
-          cmake -S . -B build
+          cmake -DCMAKE_BUILD_TYPE=Release -S . -B build -DGTEST_ROOT="C:/gtest" -DGTEST_LIBRARIES="C:/gtest/lib" -DGTEST_INCLUDE_DIRS="C:/gtest/include"
           cmake --build build
 
-      # 4. Запуск тестов
+      # 5. Запуск тестов
       - name: Run tests
         run: |
           cd build
