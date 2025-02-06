@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 
 #include "red_black_tree.hpp"
+// #include "buffer.hpp"
 
 void range_queries_set(const std::string& file_name);
 
@@ -15,7 +16,7 @@ TEST(ALGORITHM_TEST, small_tests) {
     const int TEST_NUM = 9;
 
     std::ifstream test_file;
-    std::filesystem::path file_name = "./tests/tests.txt";
+    std::filesystem::path file_name = std::filesystem::path("tests") / "tests.txt";
     test_file.open(file_name);
     if (!test_file.is_open())
         throw std::invalid_argument("wrong file name");
@@ -54,7 +55,7 @@ TEST(ALGORITHM_TEST, small_tests) {
 TEST(BIG_TEST, big_test) {
 
     std::ifstream test_file;
-    std::filesystem::path file_name = "./tests/range_query_test.txt";
+    std::filesystem::path file_name = std::filesystem::path("tests") / "range_query_test.txt";
     test_file.open(file_name);
     if (!test_file.is_open())
         throw std::invalid_argument("wrong file name");

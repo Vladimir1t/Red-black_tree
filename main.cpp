@@ -42,7 +42,8 @@ int main() {
         std::cout << std::endl;
 
         #ifndef NDEBUG
-           print_graph(range_quer.rb_tree);
+            Tree::print_tree<int64_t> pr_tr;
+            pr_tr.print_graph(range_quer.rb_tree);
         #endif
     }
     catch (const std::exception&) {
@@ -51,29 +52,6 @@ int main() {
     }
     
     return 0;
-}
-
-/*   create a tree grpah in graphviz   */
-void print_graph(const Tree::Red_black_tree<int64_t>& rb_tree) {
-
-    std::ofstream file_graph;
-    std::filesystem::path file_name = "graphviz/file_graph.dot";
-    file_graph.open(file_name);
-
-    file_graph << "digraph RB_tree{\n"
-                  "label = < Red-black tree >;\n"
-                  "bgcolor = \"DarkGrey\";\n"
-                  "node [shape = record, tfillcolor = \"pink\", penwidth = 5, color = \"Cornsilk\", fontcolor = \"white\" ];\n"
-                  "edge [style = filled ];\n";
-           
-    rb_tree.create_graph(file_graph);
-    file_graph << "}";
-    file_graph.close();
-    std::stringstream graph_cmd;
-    graph_cmd << "dot -Tpng " << file_name << " -o " << "graphviz/rb_tree.png -Gdpi=100\n";
-    
-    std::system(graph_cmd.str().c_str());
-    std::system("open graphviz/rb_tree.png");
 }
 
 int64_t range_queries_set(const std::set<int64_t>& set, int64_t a, int64_t b) {

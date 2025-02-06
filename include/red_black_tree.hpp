@@ -20,9 +20,7 @@ struct Node {
     Color color_;
     Key_t key_;
 
-    Node(Key_t key) : key_(key) { color_ = Color::red; }
-    Node(Key_t key, Color color) : key_(key), color_(color) {}
-    Node() = default;
+    Node(const Key_t &key, Color color = Color::red) : key_{key}, color_{color} {}
 };
 
 /** @brief Red_black_tree - a class of spaces and methods of red-black tree.
@@ -83,7 +81,8 @@ private:
         root_->color_ = Color::black;
     }
 
-    void fix_insert_without_rotate(std::shared_ptr<Node<Key_t>> node, std::shared_ptr<Node<Key_t>> uncle) {
+    void fix_insert_without_rotate(std::shared_ptr<Node<Key_t>> node, 
+                                    std::shared_ptr<Node<Key_t>> uncle) {
         node->parent_->color_ = Color::black;
         uncle->color_ = Color::black;
         node->parent_->parent_->color_ = Color::red;
@@ -133,11 +132,11 @@ public:
     }
     Red_black_tree() = default;
 
-    std::shared_ptr<Node<Key_t>> get_root() {
+    std::shared_ptr<Node<Key_t>> get_root() const {
         return root_;
     }
 
-    void insert_elem(Key_t key) {
+    void insert_elem(const Key_t& key) {
 
         auto new_node = std::make_shared<Node<Key_t>>(key);
         auto current = root_;
@@ -165,7 +164,7 @@ public:
         fix_insert(new_node);
     }
 
-    uint64_t range_queries(Key_t key1, Key_t key2) const { 
+    uint64_t range_queries(const Key_t& key1, const Key_t& key2) const { 
 
         uint64_t counter = 0;
 
@@ -176,7 +175,8 @@ public:
 
 private:
 
-    void search(const std::shared_ptr<Node<Key_t>> node, uint64_t& counter, Key_t key1, Key_t key2) const {
+    void search(const std::shared_ptr<Node<Key_t>> node, uint64_t& counter, 
+                                const Key_t& key1, const Key_t& key2) const {
 
         if (node->key_ >= key1 && node->key_ <= key2) {
             counter++;
@@ -193,30 +193,56 @@ private:
         }
         return;
     }
+};
 
+template <class Key_t>
+class print_tree final {
 public:
 
-    void create_graph(std::ofstream& file_name) const {
+    /*   create a tree grpah in graphviz   */
+    void print_graph(const Red_black_tree<int64_t>& rb_tree) {
 
-        create_graph_node(*root_, file_name);
+        std::ofstream file_graph;
+        std::filesystem::path file_name = std::filesystem::path("graphviz") / "file_graph.dot";
+        file_graph.open(file_name);
+
+        file_graph << "digraph RB_tree{\n"
+                      "label = < Red-black tree >;\n"
+                      "bgcolor = \"DarkGrey\";\n"
+                      "node [shape = record, tfillcolor = \"pink\", penwidth = 5, color = \"Cornsilk\", fontcolor = \"white\" ];\n"
+                      "edge [style = filled ];\n";
+
+        create_graph(file_graph, rb_tree.get_root());
+        file_graph << "}";
+        file_graph.close();
+        std::stringstream graph_cmd;
+        graph_cmd << "dot -Tpng " << file_name << " -o " << "graphviz/rb_tree.png -Gdpi=100\n";
+
+        std::system(graph_cmd.str().c_str());
+        std::system("open graphviz/rb_tree.png");
+    }
+
+    static void create_graph(std::ofstream& file_name, std::shared_ptr<Node<Key_t>> root) {
+
+        create_graph_node(*root, file_name);
     }
 
     static void create_graph_node(Node<Key_t>& node, std::ofstream& file_name) {
 
         if (node.left_) {
-            file_name << node.key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.color_) == 0 ?
-                                                                    "DarkRed" : "black") << ", label = \"" <<  node.key_ << "\" ];\n"
-                      << node.left_->key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.left_->color_) == 0 ?
-                                                                    "DarkRed" : "black") << ", label = \"" << node.left_->key_ << "\" ];\n"
-                      << node.key_ << " -> " << node.left_->key_ << ";\n";
+            file_name << node.key_ << " [shape = Mrecord, style = filled, fillcolor = " 
+                << (static_cast<int>(node.color_) == 0 ? "DarkRed" : "black") << ", label = \"" <<  node.key_ << "\" ];\n"
+                << node.left_->key_ << " [shape = Mrecord, style = filled, fillcolor = " 
+                << (static_cast<int>(node.left_->color_) == 0 ? "DarkRed" : "black") << ", label = \"" << node.left_->key_ << "\" ];\n"
+                << node.key_ << " -> " << node.left_->key_ << ";\n";
             create_graph_node(*node.left_, file_name);
         }
         if (node.right_) {
-            file_name << node.key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.color_) == 0 ? 
-                                                                    "DarkRed" : "black") << ", label = \"" <<  node.key_ << "\" ];\n"
-                      << node.right_->key_ << " [shape = Mrecord, style = filled, fillcolor = " << (static_cast<int>(node.right_->color_) == 0 ? 
-                                                                    "DarkRed" : "black") << ", label = \"" << node.right_->key_ << "\" ];\n"
-                      << node.key_ << " -> " << node.right_->key_ << ";\n";
+            file_name << node.key_ << " [shape = Mrecord, style = filled, fillcolor = " 
+                << (static_cast<int>(node.color_) == 0 ? "DarkRed" : "black") << ", label = \"" <<  node.key_ << "\" ];\n"
+                << node.right_->key_ << " [shape = Mrecord, style = filled, fillcolor = " 
+                << (static_cast<int>(node.right_->color_) == 0 ? "DarkRed" : "black") << ", label = \"" << node.right_->key_ << "\" ];\n"
+                << node.key_ << " -> " << node.right_->key_ << ";\n";
             create_graph_node(*node.right_, file_name);
         }
     }
